@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h1>Current Status</h1>
+
+<table dojotype="dojox.grid.DataGrid">
+  <thead>
+    <tr>
+      <th>Database</th>
+      <th>Ashburn Synced</th>
+      <th>Allen Synced</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, value in current_status|dictsort %}
+    <tr>
+      <td>{{ key }}</td>
+      <td>{{ value['%s-Ashburn' % key].synced }}</td>
+      <td>{{ value['%s-Allen' % key].synced }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

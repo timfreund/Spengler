@@ -19,5 +19,6 @@ setup(
     [console_scripts]
     spengler-daemon = spengler.cli:replication_check_daemon
     spengler-replication-check = spengler.cli:replication_check
+    spengler-webserver = spengler.restful:run_server
     """,
 )

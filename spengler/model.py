@@ -77,11 +77,12 @@ class ReplicationStatusDaemon():
         
         self.callbacks.append(self.results_callback)
 
-        self.active = True
+        self.active = False
         self.check_threads = []
 
     def start(self):
         print "Starting interval timer thread"
+        self.active = True
         self.interval_thread = Thread(target=self.interval_timer)
         self.interval_thread.setDaemon(True)
         self.interval_thread.start()        

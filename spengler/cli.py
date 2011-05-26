@@ -45,6 +45,17 @@ def replication_check():
     
     pair.test_replication()
 
+def configure_replication_check_daemon(configuration_location):
+    configuration_file = open(configuration_location, "r")
+    configuration_text = configuration_file.read()
+    configuration_file.close()
+
+    json_decoder = json.JSONDecoder()
+    configuration_json = json_decoder.decode(configuration_text)
+
+    daemon = model.configure_replication_daemon(configuration_json)
+    return daemon
+
 def replication_check_daemon():
     parser = OptionParser(usage="usage: %%prog\n%s" % __doc__)
     parser.add_option("-c", "--config-file", dest="configuration_file")
@@ -55,14 +66,7 @@ def replication_check_daemon():
         print "A configuration file is required"
         sys.exit(1)
 
-    configuration_file = open(options.configuration_file, "r")
-    configuration_text = configuration_file.read()
-    configuration_file.close()
-
-    json_decoder = json.JSONDecoder()
-    configuration_json = json_decoder.decode(configuration_text)
-
-    daemon = model.configure_replication_daemon(configuration_json)
+    daemon = configure_replication_check_daemon(options.configuration_file)
     daemon.start()
 
     import time
