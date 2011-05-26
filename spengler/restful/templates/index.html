@@ -3,7 +3,7 @@
 
 <h1>Current Status</h1>
 
-<table dojotype="dojox.grid.DataGrid">
+<table>
   <thead>
     <tr>
       <th>Database</th>
@@ -15,8 +15,10 @@
     {% for key, value in current_status|dictsort %}
     <tr>
       <td>{{ key }}</td>
-      <td>{{ value['%s-Ashburn' % key].synced }}</td>
-      <td>{{ value['%s-Allen' % key].synced }}</td>
+      {% set class_name = "synced" if value['%s-Ashburn' % key].synced else "unsynced" %}
+      <td class="{{class_name}}">{{ value['%s-Ashburn' % key].synced }}</td>
+      {% set class_name = "synced" if value['%s-Allen' % key].synced else "unsynced" %}
+      <td class="{{class_name}}">{{ value['%s-Allen' % key].synced }}</td>
     </tr>
     {% endfor %}
   </tbody>

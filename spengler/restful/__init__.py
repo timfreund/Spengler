@@ -13,9 +13,11 @@ def before_request():
 
 @app.route('/')
 def index():
-    return flask.render_template('index.html',
-                                 current_status=app.config.rep_check_daemon.current_results)
-    # return flask.jsonify(app.config.rep_check_daemon.current_results)
+    if flask.request.content_type == 'application/json':
+        return flask.jsonify(app.config.rep_check_daemon.current_results)
+    else:
+        return flask.render_template('index.html',
+                                     current_status=app.config.rep_check_daemon.current_results)
 
 def run_server():
     parser = OptionParser(usage="usage: %%prog\n%s" % __doc__)

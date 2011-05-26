@@ -1,0 +1,18 @@
+body { 
+  background: #222222 url(../images/background_grey.png) bottom left repeat-x;
+  color: #aaaaaa;
+  font-family: Sans-Serif;
+}
+
+td, th {
+  height: 4em;
+}
+
+td.synced {
+  background-color: #224422;
+}
+
+td.unsynced {
+  background-color: #442222;
+}
+
