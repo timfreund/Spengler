@@ -7,18 +7,18 @@
   <thead>
     <tr>
       <th>Database</th>
-      <th>Ashburn Synced</th>
-      <th>Allen Synced</th>
+      <th>{{ left_alias }} Synced</th>
+      <th>{{ right_alias }} Synced</th>
     </tr>
   </thead>
   <tbody>
     {% for key, value in current_status|dictsort %}
     <tr>
       <td>{{ key }}</td>
-      {% set class_name = "synced" if value['%s-Ashburn' % key].synced else "unsynced" %}
-      <td class="{{class_name}}">{{ value['%s-Ashburn' % key].synced }}</td>
-      {% set class_name = "synced" if value['%s-Allen' % key].synced else "unsynced" %}
-      <td class="{{class_name}}">{{ value['%s-Allen' % key].synced }}</td>
+      {% set class_name = "synced" if value['%s-%s' % (key, left_alias)].synced else "unsynced" %}
+      <td class="{{class_name}}">{{ value['%s-%s' % (key, left_alias)].synced }}</td>
+      {% set class_name = "synced" if value['%s-%s' % (key, right_alias)].synced else "unsynced" %}
+      <td class="{{class_name}}">{{ value['%s-%s' % (key, right_alias)].synced }}</td>
     </tr>
     {% endfor %}
   </tbody>
