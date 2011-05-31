@@ -2,17 +2,7 @@ from optparse import OptionParser
 from spengler import model
 import json
 import sys
-
-def create_default_arg_parser():
-    parser = OptionParser(usage="usage: %%prog\n%s" % __doc__)
-    parser.add_option("-l", "--left-db", dest="left_db_url")
-    parser.add_option("-r", "--right-db", dest="right_db_url")
-    parser.add_option("-s", "--selector", dest="selector", help="Query to find the latest data from a database")
-    parser.add_option("-v", "--vaildator", dest="validator", help="Query to validate the existence in this database of the other database's latest data")
-    parser.add_option("-d", "--debug-output", dest="debug", 
-                      action="store_true", default=False,
-                      help="Provide verbose debug output")
-    return parser
+import time
 
 def results_printer(synced, source, destination, **kw):
     status = "SYNCED" if synced else "FAILED"
@@ -22,28 +12,18 @@ def verbose_printer(synced, source, destination, row_id, selection_time, validat
     print "%s,%s,%s,%s,%s,%s" % (synced, source, destination, row_id, selection_time, validation_time)
 
 def replication_check():
-    (options, args) = create_default_arg_parser().parse_args()
+    parser = OptionParser(usage="usage: %%prog\n%s" % __doc__)
+    parser.add_option("-c", "--config-file", dest="configuration_file")
 
-    if options.left_db_url==None or options.right_db_url==None:
-        print("Left and right database urls are required")
+    (options, args) = parser.parse_args()
+
+    if options.configuration_file == None:
+        print "A configuration file is required"
         sys.exit(1)
 
-    if options.selector==None or options.validator==None:
-        print("Selector and validator queries are required")
-        sys.exit(1)
-
-    left = model.create_engine(options.left_db_url)
-    right = model.create_engine(options.right_db_url)
-    
-    pair = model.DatabasePair("Manual Check", left, right, 
-                              options.selector, options.validator)
-
-    if options.debug:
-        pair.add_callback(verbose_printer)
-    else:
-        pair.add_callback(results_printer)
-    
-    pair.test_replication()
+    print "Synced, Source DB, Destination DB, Row ID, Selection Query Time, Validation Query Time"
+    daemon = configure_replication_check_daemon(options.configuration_file)
+    daemon.check_replication()
 
 def configure_replication_check_daemon(configuration_location):
     configuration_file = open(configuration_location, "r")
@@ -69,6 +49,9 @@ def replication_check_daemon():
     daemon = configure_replication_check_daemon(options.configuration_file)
     daemon.start()
 
-    import time
-    while True:
-        time.sleep(3600)
+    while not len(daemon.check_threads):
+        time.sleep(5)
+    daemon.active = False
+
+    while len(daemon.check_threads):
+        time.sleep(5)

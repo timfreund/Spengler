@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from sqlalchemy.exceptions import DatabaseError
 from threading import Thread
 import sqlalchemy
 import time
@@ -45,8 +46,27 @@ class DatabasePair():
             callback(**results)
 
     def __test_replication(self, a, b):
-        con_a = a.connect()
-        con_b = b.connect()
+        con_a = None
+        con_b = None
+
+        try:
+            con_a = a.connect()
+        except DatabaseError:
+            print "Failed connection: %s" % a.url
+
+        try:
+            con_b = b.connect()
+        except DatabaseError:
+            print "Failed connection: %s" % b.url
+
+        if con_a is None or con_b is None:
+            return dict(synced=False, row_id=-1, found=0,
+                        timestamp=datetime.now().isoformat(),
+                        selection_time=0,
+                        validation_time=0,
+                        source=a.display_name,
+                        destination=b.display_name,
+                        pair_name=self.name)
 
         selection_time = time.time()
         a_row_id = con_a.execute(self.selector).fetchone()[0]
@@ -67,7 +87,7 @@ class DatabasePair():
                     pair_name=self.name)
 
 class ReplicationStatusDaemon():
-    def __init__(self, database_pairs={}, check_interval=600, left_alias="Left", right_alias="Right", callbacks=[]):
+    def __init__(self, database_pairs={}, check_interval=1200, left_alias="Left", right_alias="Right", callbacks=[]):
         self.database_pairs = database_pairs
         self.current_results = {}
         self.left_alias = left_alias
