@@ -1,0 +1,42 @@
+{
+    "aliases": {
+        "left": "Primary",
+        "right": "Secondary"
+    },
+
+    "callbacks": [
+        "spengler.cli:verbose_printer"
+    ],
+
+    "databases": [
+        {
+            "name": "Customers",
+            "left": "oracle://scott:tiger@dbhost01:1521/customers",
+            "right": "oracle://scott:tiger@dbhost02:1521/customers",
+            "query_class": "customers"
+        },
+        {
+            "name": "AccountsPayable",
+            "left": "postgresql://apuser:appassword@pgdb01:5432/apdb",
+            "right": "postgresql://apuser:appassword@pbdb02:5432/apdb",
+            "query_class": "accounting"
+        },
+        {
+            "name": "AccountsReceivable",
+            "left": "postgresql://aruser:arpassword@pgdb01:5432/ardb",
+            "right": "postgresql://aruser:arpassword@pgdb02:5432/ardb",
+            "query_class": "accounting"
+        }
+    ],
+    
+    "query_classes": {
+        "customers": {
+            "selector": "select cusomter_id from customers where create_date > (select max(create_date) -2/1440 from customers) order by create_date asc",
+            "validator": "select count(*) from customers where cusomter_id=%d"
+        },
+        "accounting": {
+            "selector": "select transaction_id from transactions where trans_timestamp > (select max(trans_timestamp) -2/1440 from transactions) order by trans_timestamp asc",
+            "validator": "select count(*) from transactions where transaction_id=%d"
+        }
+    }
+}
