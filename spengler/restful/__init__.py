@@ -2,6 +2,7 @@ from flask import Flask
 from optparse import OptionParser
 from spengler import cli, model
 import flask
+import sys
 
 app = Flask(__name__)
 
