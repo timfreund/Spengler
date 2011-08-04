@@ -10,6 +10,7 @@ def results_printer(synced, source, destination, **kw):
 
 def verbose_printer(synced, source, destination, row_id, selection_time, validation_time, **kw):
     print "%s,%s,%s,%s,%s,%s" % (synced, source, destination, row_id, selection_time, validation_time)
+    sys.stdout.flush()
 
 def replication_check():
     parser = OptionParser(usage="usage: %%prog\n%s" % __doc__)
