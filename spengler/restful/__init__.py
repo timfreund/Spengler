@@ -2,6 +2,7 @@ from flask import Flask
 from optparse import OptionParser
 from spengler import cli, model
 import flask
+import sys
 
 app = Flask(__name__)
 
@@ -17,6 +18,8 @@ def index():
         return flask.jsonify(app.config.rep_check_daemon.current_results)
     else:
         return flask.render_template('index.html',
+                                     left_alias=app.config.rep_check_daemon.left_alias,
+                                     right_alias=app.config.rep_check_daemon.right_alias,
                                      current_status=app.config.rep_check_daemon.current_results)
 
 def run_server():
